@@ -102,6 +102,11 @@ class HybridReadiumView: HybridReadiumViewSpec {
 
         if let epubVC = vc as? EPUBViewController {
           epubVC.selectionActionDelegate = self
+        } else if let pdfVC = vc as? PDFViewController {
+          pdfVC.selectionActionDelegate = self
+          pdfVC.onSelectionChange = { [weak self] event in
+            self?.onSelectionChange?(event)
+          }
         }
 
         self.addViewControllerAsSubview(vc)
@@ -113,53 +118,59 @@ class HybridReadiumView: HybridReadiumViewSpec {
 
   private func updatePreferences() {
     guard readerViewController != nil else { return }
-    guard let navigator = readerViewController?.navigator as? EPUBNavigatorViewController else { return }
     guard let prefs = preferences else { return }
 
-    let epubPrefs = nitroPreferencesToEPUB(prefs)
-    navigator.submitPreferences(epubPrefs)
+    if let epubNavigator = readerViewController?.navigator as? EPUBNavigatorViewController {
+      let epubPrefs = nitroPreferencesToEPUB(prefs)
+      epubNavigator.submitPreferences(epubPrefs)
+    } else if let pdfNavigator = readerViewController?.navigator as? PDFNavigatorViewController {
+      let pdfPrefs = nitroPreferencesToPDF(prefs)
+      pdfNavigator.submitPreferences(pdfPrefs)
+    }
   }
 
   // MARK: - Decorations
 
   private func updateDecorations() {
     guard readerViewController != nil else { return }
-    guard let navigator = readerViewController?.navigator as? DecorableNavigator else { return }
     guard let groups = decorations else { return }
 
-    for group in groups {
-      let readiumDecorations = group.decorations.compactMap { dec -> RDecoration? in
-        return nitroDecorationToReadium(dec)
-      }
+    if let navigator = readerViewController?.navigator as? DecorableNavigator {
+      // EPUB path: use Readium's native decoration system
+      for group in groups {
+        let readiumDecorations = group.decorations.compactMap { dec -> RDecoration? in
+          return nitroDecorationToReadium(dec)
+        }
 
-      navigator.apply(decorations: readiumDecorations, in: group.name)
+        navigator.apply(decorations: readiumDecorations, in: group.name)
 
-      if !activeDecorationGroups.contains(group.name) {
-        activeDecorationGroups.insert(group.name)
+        if !activeDecorationGroups.contains(group.name) {
+          activeDecorationGroups.insert(group.name)
 
-        navigator.observeDecorationInteractions(inGroup: group.name) { [weak self] event in
-          guard let self = self else { return }
+          navigator.observeDecorationInteractions(inGroup: group.name) { [weak self] event in
+            guard let self = self else { return }
 
-          let decorationPayload = readiumDecorationToNitro(event.decoration, group: event.group)
+            let decorationPayload = readiumDecorationToNitro(event.decoration, group: event.group)
 
-          var rect: Rect?
-          if let r = event.rect {
-            rect = Rect(x: Double(r.origin.x), y: Double(r.origin.y), width: Double(r.size.width), height: Double(r.size.height))
+            var rect: Rect?
+            if let r = event.rect {
+              rect = Rect(x: Double(r.origin.x), y: Double(r.origin.y), width: Double(r.size.width), height: Double(r.size.height))
+            }
+
+            var point: Point?
+            if let p = event.point {
+              point = Point(x: Double(p.x), y: Double(p.y))
+            }
+
+            let payload = DecorationActivatedEvent(
+              decoration: decorationPayload,
+              group: event.group,
+              rect: rect,
+              point: point
+            )
+
+            self.onDecorationActivated?(payload)
           }
-
-          var point: Point?
-          if let p = event.point {
-            point = Point(x: Double(p.x), y: Double(p.y))
-          }
-
-          let payload = DecorationActivatedEvent(
-            decoration: decorationPayload,
-            group: event.group,
-            rect: rect,
-            point: point
-          )
-
-          self.onDecorationActivated?(payload)
         }
       }
     }

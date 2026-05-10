@@ -1,6 +1,6 @@
 import type { Locator } from 'react-native-readium';
 
-export type PublicationFormat = 'epub' | 'cbz';
+export type PublicationFormat = 'epub' | 'cbz' | 'pdf';
 
 export interface BookOption {
   id: string;

@@ -175,14 +175,14 @@ export const Reader: React.FC<ReaderProps> = ({
           <ReadiumView
             ref={ref}
             file={file}
-            preferences={format === 'epub' ? preferences : undefined}
-            decorations={format === 'epub' ? decorations : undefined}
-            selectionActions={format === 'epub' ? epubSelectionActions : undefined}
+            preferences={format !== 'cbz' ? preferences : undefined}
+            decorations={format !== 'cbz' ? decorations : undefined}
+            selectionActions={format !== 'cbz' ? epubSelectionActions : undefined}
             onLocationChange={handleLocationChange}
             onPublicationReady={handlePublicationReady}
-            onDecorationActivated={format === 'epub' ? handleDecorationActivated : undefined}
-            onSelectionChange={format === 'epub' ? handleSelectionChange : undefined}
-            onSelectionAction={format === 'epub' ? handleSelectionAction : undefined}
+            onDecorationActivated={format !== 'cbz' ? handleDecorationActivated : undefined}
+            onSelectionChange={format !== 'cbz' ? handleSelectionChange : undefined}
+            onSelectionAction={format !== 'cbz' ? handleSelectionAction : undefined}
           />
         </View>
 

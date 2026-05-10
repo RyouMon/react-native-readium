@@ -1,5 +1,12 @@
 import React, { useCallback, useRef, useState } from 'react';
-import { View, Text, TouchableOpacity, StyleSheet, Platform, ScrollView } from 'react-native';
+import {
+  View,
+  Text,
+  TouchableOpacity,
+  StyleSheet,
+  Platform,
+  ScrollView,
+} from 'react-native';
 import BottomSheet from '@gorhom/bottom-sheet';
 import MaterialIcons from 'react-native-vector-icons/MaterialIcons';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
@@ -7,7 +14,7 @@ import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { Reader } from './Reader';
 import type { ReaderHandle } from './Reader';
 import { ControlBar } from './ControlBar';
-import type { BookOption, PublicationFormat } from '../types/reader.types';
+import type { BookOption } from '../types/reader.types';
 import type { ReadiumProps } from 'react-native-readium';
 
 type ContentMode = 'reader' | 'details';
@@ -41,10 +48,10 @@ const BookDetails: React.FC<{
       <Text style={styles.detailsAuthor}>{book.author}</Text>
 
       <Text style={styles.detailsDescription}>
-        This view demonstrates that the ReadiumView native Fragment is
-        properly removed when React unmounts the Reader component. If the
-        Fragment cleanup is broken, this view will be covered by the stale
-        WebView and the button below will not be pressable.
+        This view demonstrates that the ReadiumView native Fragment is properly
+        removed when React unmounts the Reader component. If the Fragment
+        cleanup is broken, this view will be covered by the stale WebView and
+        the button below will not be pressable.
       </Text>
 
       <TouchableOpacity style={styles.openReaderButton} onPress={onOpenReader}>
@@ -106,6 +113,7 @@ export const ReaderBottomSheet: React.FC<ReaderBottomSheetProps> = ({
               <ControlBar
                 preferences={readerHandle.preferences}
                 onPreferencesChange={readerHandle.setPreferences}
+                format={book.format}
                 toc={readerHandle.toc}
                 onNavigateToTocItem={readerHandle.navigateToTocItem}
                 highlights={readerHandle.highlights}
