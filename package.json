@@ -1,5 +1,5 @@
 {
-  "name": "react-native-readium",
+  "name": "@ryoumon/react-native-readium",
   "version": "5.0.0-rc.17",
   "description": "A react-native wrapper for https://readium.org/",
   "main": "lib/src/index",
