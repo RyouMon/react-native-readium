@@ -2,8 +2,11 @@ package com.reactnativereadium.utils
 
 import android.graphics.Color
 import com.margelo.nitro.reactnativereadium.*
+import org.readium.adapter.pdfium.navigator.PdfiumPreferences as ReadiumPdfPreferences
 import org.readium.r2.navigator.epub.EpubPreferences as ReadiumEpubPreferences
+import org.readium.r2.navigator.preferences.Axis
 import org.readium.r2.navigator.preferences.ColumnCount
+import org.readium.r2.navigator.preferences.Fit
 import org.readium.r2.navigator.preferences.FontFamily
 import org.readium.r2.navigator.preferences.ImageFilter
 import org.readium.r2.navigator.preferences.ReadingProgression as NavReadingProgression
@@ -59,6 +62,19 @@ internal fun nitroPreferencesToEpub(prefs: Preferences): ReadiumEpubPreferences 
     typeScale = prefs.typeScale,
     verticalText = prefs.verticalText,
     wordSpacing = prefs.wordSpacing,
+  )
+}
+
+internal fun nitroPreferencesToPdf(prefs: Preferences): ReadiumPdfPreferences {
+  val isSepia = prefs.theme == "sepia"
+  val bgColor = prefs.backgroundColor?.let { parseReadiumColor(it) }
+    ?: if (isSepia && prefs.backgroundColor == null) parseReadiumColor(SEPIA_BACKGROUND) else null
+
+  return ReadiumPdfPreferences(
+    fit = Fit.WIDTH,
+    pageSpacing = null,
+    readingProgression = prefs.readingProgression?.let { parseReadingProgression(it) },
+    scrollAxis = if (prefs.scroll == true) Axis.VERTICAL else Axis.HORIZONTAL
   )
 }
 

@@ -35,6 +35,14 @@ const books: BookOption[] = [
     bundledAsset: 'bobby_make_believe_sample.cbz',
     path: `${RNFS.DocumentDirectoryPath}/bobby_make_believe_sample.cbz`,
   },
+  {
+    id: 'pride-and-prejudice',
+    title: 'Pride and Prejudice',
+    author: 'Jane Austen',
+    format: 'pdf',
+    bundledAsset: 'pride-and-prejudice.pdf',
+    path: `${RNFS.DocumentDirectoryPath}/pride-and-prejudice.pdf`,
+  },
 ];
 
 export default function App() {

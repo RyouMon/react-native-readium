@@ -14,6 +14,7 @@ import org.readium.r2.shared.util.format.FormatHints
 import org.readium.r2.shared.util.http.DefaultHttpClient
 import org.readium.r2.shared.util.toUrl
 import org.readium.r2.streamer.PublicationOpener
+import org.readium.adapter.pdfium.document.PdfiumDocumentFactory
 import org.readium.r2.streamer.parser.DefaultPublicationParser
 
 
@@ -30,7 +31,7 @@ class ReaderService(
       context = reactContext,
       assetRetriever = assetRetriever,
       httpClient = httpClient,
-      pdfFactory = null,
+      pdfFactory = PdfiumDocumentFactory(reactContext),
     )
   )
 
@@ -97,12 +98,17 @@ class ReaderService(
       .onSuccess { publication ->
         val locator = locatorFromLinkOrLocator(initialLocation, publication)
         @OptIn(ExperimentalReadiumApi::class)
-        val readerFragment: BaseReaderFragment =
-          if (publication.conformsTo(Publication.Profile.DIVINA)) {
+        val readerFragment: BaseReaderFragment = when {
+          publication.conformsTo(Publication.Profile.DIVINA) -> {
             ImageReaderFragment.newInstance().also { it.initFactory(publication, locator) }
-          } else {
+          }
+          publication.conformsTo(Publication.Profile.PDF) -> {
+            PdfReaderFragment.newInstance().also { it.initFactory(publication, locator) }
+          }
+          else -> {
             EpubReaderFragment.newInstance().also { it.initFactory(publication, locator) }
           }
+        }
         callback.invoke(readerFragment)
       }
       .onFailure {

@@ -27,11 +27,28 @@ export const HomeScreen: React.FC<HomeScreenProps> = ({
       onPress={() => onSelectBook(item)}
       activeOpacity={0.7}
     >
-      <View style={[styles.iconContainer, item.format === 'cbz' && styles.iconContainerCbz]}>
+      <View
+        style={[
+          styles.iconContainer,
+          item.format === 'cbz' && styles.iconContainerCbz,
+        ]}
+      >
         <MaterialIcons
-          name={item.format === 'cbz' ? 'image' : 'menu-book'}
+          name={
+            item.format === 'cbz'
+              ? 'image'
+              : item.format === 'pdf'
+              ? 'picture-as-pdf'
+              : 'menu-book'
+          }
           size={32}
-          color={item.format === 'cbz' ? '#FF6B35' : '#007AFF'}
+          color={
+            item.format === 'cbz'
+              ? '#FF6B35'
+              : item.format === 'pdf'
+              ? '#F44336'
+              : '#007AFF'
+          }
         />
       </View>
       <View style={styles.cardContent}>

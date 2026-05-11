@@ -1,16 +1,23 @@
 import React from 'react';
 import { View, TouchableOpacity, StyleSheet } from 'react-native';
-import type { ReadiumProps, Link, Decoration, Locator } from 'react-native-readium';
+import type {
+  ReadiumProps,
+  Link,
+  Decoration,
+  Locator,
+} from 'react-native-readium';
 import MaterialIcons from 'react-native-vector-icons/MaterialIcons';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 import { TableOfContents } from './TableOfContents';
 import { PreferencesEditor } from './PreferencesEditor';
 import { HighlightManager } from './highlights';
+import type { PublicationFormat } from '../types/reader.types';
 
 interface ControlBarProps {
   preferences: ReadiumProps['preferences'];
   onPreferencesChange: (preferences: ReadiumProps['preferences']) => void;
+  format?: PublicationFormat;
   toc: Link[] | null;
   onNavigateToTocItem: (item: Link) => void;
   highlights: Decoration[];
@@ -24,6 +31,7 @@ interface ControlBarProps {
 export const ControlBar: React.FC<ControlBarProps> = ({
   preferences,
   onPreferencesChange,
+  format,
   toc,
   onNavigateToTocItem,
   highlights,
@@ -46,12 +54,15 @@ export const ControlBar: React.FC<ControlBarProps> = ({
       </TouchableOpacity>
 
       <View style={styles.controls}>
-        <View style={styles.iconButton}>
-          <PreferencesEditor
-            preferences={preferences}
-            onChange={onPreferencesChange}
-          />
-        </View>
+        {format !== 'pdf' && (
+          <View style={styles.iconButton}>
+            <PreferencesEditor
+              preferences={preferences}
+              onChange={onPreferencesChange}
+              format={format}
+            />
+          </View>
+        )}
 
         <View style={styles.iconButton}>
           <TableOfContents items={toc} onPress={onNavigateToTocItem} />

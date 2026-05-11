@@ -6,10 +6,12 @@ import { RANGES } from 'react-native-readium';
 import { ReaderButton } from './ReaderButton';
 import { BaseModal } from './BaseModal';
 import { modalStyles, colors } from '../styles/modal';
+import type { PublicationFormat } from '../types/reader.types';
 
 interface Props {
   preferences: ReadiumProps['preferences'];
   onChange: (preferences: ReadiumProps['preferences']) => void;
+  format?: PublicationFormat;
 }
 
 type Theme = NonNullable<ReadiumProps['preferences']['theme']>;
@@ -20,7 +22,8 @@ const THEME_LABELS: Record<Theme, string> = {
   sepia: 'Sepia',
 };
 
-export const PreferencesEditor = ({ preferences, onChange }: Props) => {
+export const PreferencesEditor = ({ preferences, onChange, format }: Props) => {
+  const isPdf = format === 'pdf';
   const [isOpen, setIsOpen] = useState<boolean>(false);
 
   const nextAppearance = useCallback((theme?: Theme) => {
@@ -83,55 +86,59 @@ export const PreferencesEditor = ({ preferences, onChange }: Props) => {
           </Text>
         </View>
 
-        {/* Font Size Setting */}
-        <View style={modalStyles.cardItem}>
-          <View style={styles.settingHeader}>
-            <Text style={styles.settingLabel}>Font Size</Text>
-            <Text style={styles.settingValue}>
-              {preferences.fontSize?.toFixed(1) || '1.0'}
-            </Text>
+        {/* Font Size Setting — hidden for PDF */}
+        {!isPdf && (
+          <View style={modalStyles.cardItem}>
+            <View style={styles.settingHeader}>
+              <Text style={styles.settingLabel}>Font Size</Text>
+              <Text style={styles.settingValue}>
+                {preferences.fontSize?.toFixed(1) || '1.0'}
+              </Text>
+            </View>
+            <Slider
+              style={styles.slider}
+              minimumValue={RANGES.fontSize[0]}
+              maximumValue={RANGES.fontSize[1]}
+              step={0.1}
+              value={preferences.fontSize}
+              onSlidingComplete={handleFontSizeChange}
+              minimumTrackTintColor={colors.primary}
+              maximumTrackTintColor={colors.border.secondary}
+              thumbTintColor={colors.primary}
+            />
+            <View style={styles.rangeLabels}>
+              <Text style={styles.rangeLabel}>Small</Text>
+              <Text style={styles.rangeLabel}>Large</Text>
+            </View>
           </View>
-          <Slider
-            style={styles.slider}
-            minimumValue={RANGES.fontSize[0]}
-            maximumValue={RANGES.fontSize[1]}
-            step={0.1}
-            value={preferences.fontSize}
-            onSlidingComplete={handleFontSizeChange}
-            minimumTrackTintColor={colors.primary}
-            maximumTrackTintColor={colors.border.secondary}
-            thumbTintColor={colors.primary}
-          />
-          <View style={styles.rangeLabels}>
-            <Text style={styles.rangeLabel}>Small</Text>
-            <Text style={styles.rangeLabel}>Large</Text>
-          </View>
-        </View>
+        )}
 
-        {/* Page Margin Setting */}
-        <View style={[modalStyles.cardItem, modalStyles.cardItemLast]}>
-          <View style={styles.settingHeader}>
-            <Text style={styles.settingLabel}>Page Margin</Text>
-            <Text style={styles.settingValue}>
-              {preferences.pageMargins || 0}
-            </Text>
+        {/* Page Margin Setting — hidden for PDF */}
+        {!isPdf && (
+          <View style={[modalStyles.cardItem, modalStyles.cardItemLast]}>
+            <View style={styles.settingHeader}>
+              <Text style={styles.settingLabel}>Page Margin</Text>
+              <Text style={styles.settingValue}>
+                {preferences.pageMargins || 0}
+              </Text>
+            </View>
+            <Slider
+              style={styles.slider}
+              minimumValue={RANGES.pageMargins[0]}
+              maximumValue={RANGES.pageMargins[1]}
+              step={1}
+              value={preferences.pageMargins}
+              onSlidingComplete={handlePageMarginsChange}
+              minimumTrackTintColor={colors.primary}
+              maximumTrackTintColor={colors.border.secondary}
+              thumbTintColor={colors.primary}
+            />
+            <View style={styles.rangeLabels}>
+              <Text style={styles.rangeLabel}>Narrow</Text>
+              <Text style={styles.rangeLabel}>Wide</Text>
+            </View>
           </View>
-          <Slider
-            style={styles.slider}
-            minimumValue={RANGES.pageMargins[0]}
-            maximumValue={RANGES.pageMargins[1]}
-            step={1}
-            value={preferences.pageMargins}
-            onSlidingComplete={handlePageMarginsChange}
-            minimumTrackTintColor={colors.primary}
-            maximumTrackTintColor={colors.border.secondary}
-            thumbTintColor={colors.primary}
-          />
-          <View style={styles.rangeLabels}>
-            <Text style={styles.rangeLabel}>Narrow</Text>
-            <Text style={styles.rangeLabel}>Wide</Text>
-          </View>
-        </View>
+        )}
       </BaseModal>
     </>
   );

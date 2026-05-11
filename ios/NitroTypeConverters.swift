@@ -54,6 +54,19 @@ func nitroPreferencesToEPUB(_ prefs: Preferences) -> EPUBPreferences {
   )
 }
 
+func nitroPreferencesToPDF(_ prefs: Preferences) -> PDFPreferences {
+  let isSepia = prefs.theme == "sepia"
+  let bgColor = prefs.backgroundColor.flatMap { ReadiumNavigator.Color(hex: $0) }
+    ?? (isSepia && prefs.backgroundColor == nil ? ReadiumNavigator.Color(hex: sepiaBackground) : nil)
+
+  return PDFPreferences(
+    backgroundColor: bgColor,
+    readingProgression: prefs.readingProgression.flatMap { ReadiumNavigator.ReadingProgression(rawValue: $0) },
+    scroll: prefs.scroll ?? false,
+    spread: prefs.spread.flatMap { Spread(rawValue: $0) }
+  )
+}
+
 func nitroLocatorToReadium(_ loc: Locator) -> RLocator? {
   let locatorData = LocatorData(
     href: loc.href,
