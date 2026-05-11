@@ -1,3 +1,12 @@
+# [5.0.0-rc.18](https://github.com/5-stones/react-native-readium/compare/v5.0.0-rc.17...v5.0.0-rc.18) (2026-05-09)
+
+
+### Features
+
+* **android, ios:** add CBZ (comic book archive) reading support ([80c7dda](https://github.com/5-stones/react-native-readium/commit/80c7dda9977e1adf6e8a453628f03762c7bdc0ec))
+
+
+
 # [5.0.0-rc.17](https://github.com/5-stones/react-native-readium/compare/v5.0.0-rc.16...v5.0.0-rc.17) (2026-03-05)
 
 
