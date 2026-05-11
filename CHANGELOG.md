@@ -1,3 +1,12 @@
+# [5.0.0-rc.19](https://github.com/5-stones/react-native-readium/compare/v5.0.0-rc.18...v5.0.0-rc.19) (2026-05-10)
+
+
+### Features
+
+* **android, ios:** add native PDF reading support ([2a3c6d4](https://github.com/5-stones/react-native-readium/commit/2a3c6d462b208277b1333bbadd39b781267e5975))
+
+
+
 # [5.0.0-rc.18](https://github.com/5-stones/react-native-readium/compare/v5.0.0-rc.17...v5.0.0-rc.18) (2026-05-09)
 
 
