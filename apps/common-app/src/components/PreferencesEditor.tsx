@@ -58,6 +58,13 @@ export const PreferencesEditor = ({ preferences, onChange, format }: Props) => {
     });
   };
 
+  const handleScrollChange = () => {
+    onChange({
+      ...preferences,
+      scroll: !preferences.scroll,
+    });
+  };
+
   return (
     <>
       <ReaderButton size={35} name="settings" onPress={() => setIsOpen(true)} />
@@ -83,6 +90,25 @@ export const PreferencesEditor = ({ preferences, onChange, format }: Props) => {
           </View>
           <Text style={styles.settingDescription}>
             Change the reading theme appearance
+          </Text>
+        </View>
+
+        {/* Page Layout Setting */}
+        <View style={modalStyles.cardItem}>
+          <View style={styles.settingHeader}>
+            <Text style={styles.settingLabel}>Page Layout</Text>
+            <TouchableOpacity
+              style={styles.themeButton}
+              onPress={handleScrollChange}
+              activeOpacity={0.7}
+            >
+              <Text style={styles.themeButtonText}>
+                {preferences.scroll ? 'Scroll' : 'Paginated'}
+              </Text>
+            </TouchableOpacity>
+          </View>
+          <Text style={styles.settingDescription}>
+            Switch between scroll and paginated reading mode
           </Text>
         </View>
 

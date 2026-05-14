@@ -54,15 +54,13 @@ export const ControlBar: React.FC<ControlBarProps> = ({
       </TouchableOpacity>
 
       <View style={styles.controls}>
-        {format !== 'pdf' && (
-          <View style={styles.iconButton}>
-            <PreferencesEditor
-              preferences={preferences}
-              onChange={onPreferencesChange}
-              format={format}
-            />
-          </View>
-        )}
+        <View style={styles.iconButton}>
+          <PreferencesEditor
+            preferences={preferences}
+            onChange={onPreferencesChange}
+            format={format}
+          />
+        </View>
 
         <View style={styles.iconButton}>
           <TableOfContents items={toc} onPress={onNavigateToTocItem} />

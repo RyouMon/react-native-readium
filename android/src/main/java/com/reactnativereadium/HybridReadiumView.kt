@@ -1,5 +1,7 @@
 package com.margelo.nitro.reactnativereadium
 
+import android.os.Handler
+import android.os.Looper
 import android.util.Log
 import android.view.Choreographer
 import android.view.View
@@ -43,6 +45,7 @@ class HybridReadiumView(private val context: android.content.Context) : HybridRe
 
   private val instanceId = nextInstanceId++
   private val hostView = FrameLayout(context)
+  private val mainHandler = Handler(Looper.getMainLooper())
   private var scope = CoroutineScope(SupervisorJob() + Dispatchers.Main)
   private var svc: ReaderService? = null
   private var fragment: BaseReaderFragment? = null
@@ -51,6 +54,7 @@ class HybridReadiumView(private val context: android.content.Context) : HybridRe
   private var isAttached = false
   private var isDestroyed = false
   private var frameCallback: Choreographer.FrameCallback? = null
+  private var pendingTeardownRunnable: Runnable? = null
 
   override val view: View get() = hostView
 
@@ -58,11 +62,18 @@ class HybridReadiumView(private val context: android.content.Context) : HybridRe
     hostView.addOnAttachStateChangeListener(object : View.OnAttachStateChangeListener {
       override fun onViewAttachedToWindow(v: View) {
         isAttached = true
+        pendingTeardownRunnable?.let { mainHandler.removeCallbacks(it) }
+        pendingTeardownRunnable = null
         buildForViewIfReady()
       }
       override fun onViewDetachedFromWindow(v: View) {
         isAttached = false
-        teardownFragment()
+        val runnable = Runnable {
+          pendingTeardownRunnable = null
+          teardownFragment()
+        }
+        pendingTeardownRunnable = runnable
+        mainHandler.postDelayed(runnable, 300)
       }
     })
   }
@@ -179,6 +190,9 @@ class HybridReadiumView(private val context: android.content.Context) : HybridRe
    * tree — use [cleanup] for permanent removal.
    */
   private fun teardownFragment() {
+    pendingTeardownRunnable?.let { mainHandler.removeCallbacks(it) }
+    pendingTeardownRunnable = null
+
     liveInstances.remove(instanceId)
 
     frameCallback?.let {
@@ -280,6 +294,9 @@ class HybridReadiumView(private val context: android.content.Context) : HybridRe
       }
     }
 
+    preferences?.let { updatePreferences() }
+    decorations?.let { updateDecorations() }
+
     activity.supportFragmentManager
       .beginTransaction()
       .replace(hostView.id, frag, hostView.id.toString())
@@ -302,9 +319,6 @@ class HybridReadiumView(private val context: android.content.Context) : HybridRe
         )
       }
     } ?: Log.w(TAG, "addFragment: fragment view is null after commitNow!")
-
-    preferences?.let { updatePreferences() }
-    decorations?.let { updateDecorations() }
 
     frag.channel.receive(frag) { event ->
       when (event) {

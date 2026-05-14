@@ -1,7 +1,7 @@
 buildscript {
   // Buildscript is evaluated before everything else so we can't use getExtOrDefault
   def kotlin_version = rootProject.ext.has('kotlinVersion') ? rootProject.ext.get('kotlinVersion') : project.properties['Readium_kotlinVersion']
-  ext.readium_version = '3.1.1'
+  ext.readium_version = '3.1.2'
 
   repositories {
     google()
@@ -159,11 +159,24 @@ dependencies {
   // readium deps
   implementation "org.readium.kotlin-toolkit:readium-shared:$readium_version"
   implementation "org.readium.kotlin-toolkit:readium-streamer:$readium_version"
-  implementation "org.readium.kotlin-toolkit:readium-adapter-pdfium:$readium_version"
+  implementation ("org.readium.kotlin-toolkit:readium-adapter-pdfium:$readium_version") {
+    // Replace the marain87 fork with mhiew's fork which fixes the
+    // NullPointerException in PDFView.loadComplete() when the view is
+    // detached before DecodingAsyncTask.onPostExecute() fires.
+    exclude group: "com.github.marain87", module: "AndroidPdfViewer"
+  }
   implementation ("org.readium.kotlin-toolkit:readium-navigator:$readium_version") {
     // this package doesn't provide audio playback, so remove exoplayer
     // transitive deps to avoid potential collisions with other projects.
     exclude group: "com.google.android.exoplayer"
+  }
+  // Required to access PDFView.Configurator in PdfiumEngineProvider.Listener.onConfigurePdfView.
+  // Using mhiew's fork (3.2.0-beta.3) which fixes a critical NPE in loadComplete() when
+  // renderingHandlerThread is null after onDetachedFromWindow().
+  implementation ("com.github.mhiew:android-pdf-viewer:3.2.0-beta.3") {
+    // Exclude mhiew's PdfiumAndroid fork to avoid duplicate classes / native libs with
+    // Readium's transitive com.github.marain87:PdfiumAndroid:1.9.8.
+    exclude group: "com.github.mhiew", module: "pdfium-android"
   }
   // other deps
   implementation "androidx.core:core-ktx:1.13.1"

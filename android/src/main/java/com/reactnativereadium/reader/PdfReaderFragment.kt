@@ -7,6 +7,7 @@ import android.view.ViewGroup
 import androidx.fragment.app.commitNow
 import androidx.lifecycle.ViewModelProvider
 import com.reactnativereadium.R
+import com.github.barteksc.pdfviewer.PDFView
 import org.readium.adapter.pdfium.navigator.PdfiumEngineProvider
 import org.readium.adapter.pdfium.navigator.PdfiumPreferences
 import org.readium.adapter.pdfium.navigator.PdfiumPreferencesEditor
@@ -14,6 +15,7 @@ import org.readium.adapter.pdfium.navigator.PdfiumSettings
 import org.readium.r2.navigator.Navigator
 import org.readium.r2.navigator.pdf.PdfNavigatorFragment
 import org.readium.r2.navigator.pdf.PdfNavigatorFactory
+import org.readium.r2.navigator.preferences.Axis
 import org.readium.r2.shared.publication.Locator
 import org.readium.r2.shared.publication.Publication
 
@@ -23,16 +25,12 @@ class PdfReaderFragment : VisualReaderFragment(), PdfNavigatorFragment.Listener 
     override lateinit var navigator: Navigator
 
     private lateinit var factory: ReaderViewModel.Factory
-    private lateinit var navigatorFactory: PdfNavigatorFactory<PdfiumSettings, PdfiumPreferences, PdfiumPreferencesEditor>
+    private var navigatorFactory: PdfNavigatorFactory<PdfiumSettings, PdfiumPreferences, PdfiumPreferencesEditor>? = null
     private var pendingPreferences: PdfiumPreferences? = null
     private lateinit var userPreferences: PdfiumPreferences
 
     fun initFactory(publication: Publication, initialLocation: Locator?) {
         factory = ReaderViewModel.Factory(publication, initialLocation)
-        navigatorFactory = PdfNavigatorFactory(
-            publication = publication,
-            pdfEngineProvider = PdfiumEngineProvider()
-        )
     }
 
     fun updatePreferences(pdfPreferences: PdfiumPreferences) {
@@ -51,7 +49,23 @@ class PdfReaderFragment : VisualReaderFragment(), PdfNavigatorFragment.Listener 
         ViewModelProvider(this, factory)
             .get(ReaderViewModel::class.java)
             .let { model = it }
-        childFragmentManager.fragmentFactory = navigatorFactory.createFragmentFactory(
+
+        val snap = pendingPreferences?.scrollAxis != Axis.VERTICAL
+
+        navigatorFactory = PdfNavigatorFactory(
+            publication = model.publication,
+            pdfEngineProvider = PdfiumEngineProvider(
+                listener = object : PdfiumEngineProvider.Listener {
+                    override fun onConfigurePdfView(configurator: PDFView.Configurator) {
+                        configurator
+                            .pageSnap(snap)
+                            .pageFling(snap)
+                    }
+                }
+            )
+        )
+
+        childFragmentManager.fragmentFactory = navigatorFactory!!.createFragmentFactory(
             initialLocator = model.initialLocation,
             initialPreferences = pendingPreferences,
             listener = this
