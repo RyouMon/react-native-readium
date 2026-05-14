@@ -1,3 +1,12 @@
+# [5.0.0-rc.20](https://github.com/5-stones/react-native-readium/compare/v5.0.0-rc.19...v5.0.0-rc.20) (2026-05-14)
+
+
+### Features
+
+* **android:** add PDF scroll/paginated mode toggle via preferences; upgrade Readium to 3.1.2 and switch to mhiew's AndroidPdfViewer fork to fix a NullPointerException in `loadComplete()` when the view detaches ([40c5775](https://github.com/5-stones/react-native-readium/commit/40c577526526c6ffaa4810cc8a758223a3225211))
+
+
+
 # [5.0.0-rc.19](https://github.com/5-stones/react-native-readium/compare/v5.0.0-rc.18...v5.0.0-rc.19) (2026-05-10)
 
 
